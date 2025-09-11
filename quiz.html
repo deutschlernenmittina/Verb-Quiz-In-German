@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>German Verb Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 40px;
+      text-align: center;
+    }
+    .quiz-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 480px;
+      margin: 0 auto;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .option-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #e0e0e0;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 1em;
+    }
+    .option-btn:hover {
+      background: #b3c6fc;
+    }
+    .result {
+      font-size: 1.1em;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    .next-btn {
+      padding: 8px 18px;
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .next-btn:disabled {
+      background: #9ab8e6;
+      cursor: not-allowed;
+    }
+    .progress {
+      margin-bottom: 15px;
+      font-size: 1em;
+      color: #4a90e2;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div id="quiz">
+      <div class="progress" id="progress"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="result" id="result"></div>
+      <button class="next-btn" id="nextBtn" disabled>Next</button>
+    </div>
+  </div>
+
+  <script>
+    // 50 German verb quiz questions: question, options, answer index, explanation
+    const quizData = [
+      {question:"What is the correct form of 'sein' for 'ich'?",options:["bist","bin","ist","seid"],answer:1,explanation:"'Ich bin' is correct. 'Bin' is the 1st person singular of 'sein'."},
+      {question:"What is the correct past participle of 'gehen'?",options:["gegessen","gegangen","gekommen","gegebt"],answer:1,explanation:"'Gegangen' is the past participle of 'gehen'."},
+      {question:"Choose the right translation for 'They have learned.'",options:["Sie hat gelernt.","Sie haben gelernt.","Ihr habt gelernt.","Er hat gelernt."],answer:1,explanation:"'Sie haben gelernt.' is correct for 'They have learned.'"},
+      {question:"Which is the correct conjugation for 'du' (informal you) of 'sprechen'?",options:["spricht","spreche","sprichst","sprecht"],answer:2,explanation:"'Du sprichst' is correct. 'Sprichst' is for 'du'."},
+      {question:"What is the correct form of 'haben' for 'ihr'?",options:["habt","hat","habe","haben"],answer:0,explanation:"'Ihr habt' is the correct form."},
+      {question:"What is the past participle of 'sehen'?",options:["gesehen","gesieht","gesehenen","gesehenes"],answer:0,explanation:"'Gesehen' is the past participle of 'sehen'."},
+      {question:"How do you say 'We are coming.' in German?",options:["Wir kommt.","Wir kommen.","Wir kommenen.","Wir kommenes."],answer:1,explanation:"'Wir kommen.' is correct."},
+      {question:"Which is the right form for 'er' of 'geben'?",options:["gebt","gibt","gebe","geben"],answer:1,explanation:"'Er gibt' is correct."},
+      {question:"What is the infinitive for 'ging'?",options:["gehen","geben","gessen","geng"],answer:0,explanation:"'Ging' is the past tense of 'gehen'."},
+      {question:"What is the correct form of 'werden' for 'sie' (they)?",options:["werde","wird","werdet","werden"],answer:3,explanation:"'Sie werden' is the correct form for 'they'."},
+      {question:"What is 'I eat' in German?",options:["Ich esse.","Ich isst.","Ich essen.","Ich gegessen."],answer:0,explanation:"'Ich esse.' is correct."},
+      {question:"Which is the past participle of 'trinken'?",options:["trinkt","trunken","getrunken","getrinkt"],answer:2,explanation:"'Getrunken' is correct."},
+      {question:"Choose the right form: 'Du ___ das Buch.' (lesen)",options:["liest","lese","liestest","lesen"],answer:0,explanation:"'Du liest' is correct."},
+      {question:"Which is 'We have spoken.' in German?",options:["Wir haben gesprochen.","Wir haben sprecht.","Wir sprechen haben.","Wir gesprochen haben."],answer:0,explanation:"'Wir haben gesprochen.' is correct."},
+      {question:"What is the correct translation for 'She writes.'?",options:["Sie schreiben.","Sie schreibt.","Sie schreibst.","Sie schreibte."],answer:1,explanation:"'Sie schreibt.' is correct."},
+      {question:"What is the correct form for 'ihr' of 'fahren'?",options:["fahrt","fährt","fahren","fahre"],answer:0,explanation:"'Ihr fahrt' is correct."},
+      {question:"What is the past participle of 'finden'?",options:["gefunden","findet","findete","findbar"],answer:0,explanation:"'Gefunden' is correct."},
+      {question:"Which is 'You (formal) have helped.' in German?",options:["Du hast geholfen.","Sie haben geholfen.","Ihr habt geholfen.","Er hat geholfen."],answer:1,explanation:"'Sie haben geholfen.' is correct for formal you."},
+      {question:"What is 'He runs.' in German?",options:["Er läuft.","Er laufen.","Er läuftest.","Er laufte."],answer:0,explanation:"'Er läuft.' is correct."},
+      {question:"Choose the correct form: 'Wir ___ das Auto.' (nehmen)",options:["nehmt","nimmt","nehmen","nimmst"],answer:2,explanation:"'Wir nehmen' is correct."},
+      {question:"What is the correct form for 'du' of 'sehen'?",options:["siehst","sehe","sieht","sehen"],answer:0,explanation:"'Du siehst' is correct."},
+      {question:"Past participle of 'schreiben'?",options:["geschreiben","geschriebt","geschrieben","geschreibe"],answer:2,explanation:"'Geschrieben' is the correct past participle."},
+      {question:"'She gives.' in German?",options:["Sie gebt.","Sie gibt.","Sie geben.","Sie gebe."],answer:1,explanation:"'Sie gibt.' is correct."},
+      {question:"Which is 'I have gone.' in German?",options:["Ich bin gegangen.","Ich habe gegangen.","Ich bin geht.","Ich habe geht."],answer:0,explanation:"'Ich bin gegangen.' is correct."},
+      {question:"What is the correct form for 'wir' of 'bringen'?",options:["bringt","bringen","bringe","bringst"],answer:1,explanation:"'Wir bringen' is correct."},
+      {question:"Past participle of 'nehmen'?",options:["genommen","nahm","genommenen","nehmend"],answer:0,explanation:"'Genommen' is correct."},
+      {question:"'They speak.' in German?",options:["Sie spricht.","Sie sprecht.","Sie sprechen.","Sie sprichtest."],answer:2,explanation:"'Sie sprechen.' is correct."},
+      {question:"What is the correct form for 'du' of 'laufen'?",options:["läuft","laufe","läufst","laufen"],answer:2,explanation:"'Du läufst' is correct."},
+      {question:"What is the past participle of 'bleiben'?",options:["bleibt","bleibte","geblieben","gebleibt"],answer:2,explanation:"'Geblieben' is correct."},
+      {question:"Which is 'We have met.' in German?",options:["Wir haben getroffen.","Wir haben treffen.","Wir treffen haben.","Wir getroffen haben."],answer:0,explanation:"'Wir haben getroffen.' is correct."},
+      {question:"What is 'She reads.' in German?",options:["Sie lese.","Sie liest.","Sie lesen.","Sie liestet."],answer:1,explanation:"'Sie liest.' is correct."},
+      {question:"Past participle of 'essen'?",options:["gegessen","gegessenes","esse","gegessenet"],answer:0,explanation:"'Gegessen' is correct."},
+      {question:"What is the correct form for 'ihr' of 'schlafen'?",options:["schlaft","schlafen","schläft","schlafst"],answer:0,explanation:"'Ihr schlaft' is correct."},
+      {question:"'He has found.' in German?",options:["Er hat finden.","Er hat gefunden.","Er hat funden.","Er gefunden hat."],answer:1,explanation:"'Er hat gefunden.' is correct."},
+      {question:"What is the correct form for 'wir' of 'gehen'?",options:["geht","gehen","gehe","gehst"],answer:1,explanation:"'Wir gehen' is correct."},
+      {question:"Past participle of 'kommen'?",options:["gekommt","gekommen","kommt","gekommenen"],answer:1,explanation:"'Gekommen' is correct."},
+      {question:"What is 'You (plural) sleep.' in German?",options:["Ihr schlafen.","Ihr schlaft.","Ihr schläft.","Ihr schlafte."],answer:1,explanation:"'Ihr schlaft.' is correct."},
+      {question:"What is the correct form for 'du' of 'geben'?",options:["gebt","gibst","gibt","geben"],answer:1,explanation:"'Du gibst' is correct."},
+      {question:"Past participle of 'fahren'?",options:["gefahrt","gefahren","fahrt","gefahrenen"],answer:1,explanation:"'Gefahren' is correct."},
+      {question:"'I have seen.' in German?",options:["Ich habe gesehen.","Ich bin gesehen.","Ich habe sehe.","Ich bin sehe."],answer:0,explanation:"'Ich habe gesehen.' is correct."},
+      {question:"What is the correct form for 'sie' (she) of 'nehmen'?",options:["nimmt","nehmst","nehmt","nehmen"],answer:0,explanation:"'Sie nimmt' is correct."},
+      {question:"Past participle of 'helfen'?",options:["geholfen","hilfe","gehelft","geholft"],answer:0,explanation:"'Geholfen' is correct."},
+      {question:"'We write.' in German?",options:["Wir schreiben.","Wir schreibt.","Wir schreibst.","Wir schreibte."],answer:0,explanation:"'Wir schreiben.' is correct."},
+      {question:"What is the correct form for 'ihr' of 'lesen'?",options:["lesen","liest","lest","leset"],answer:2,explanation:"'Ihr lest' is correct."},
+      {question:"Past participle of 'sprechen'?",options:["gesprochen","sprechend","gesprecht","gespracht"],answer:0,explanation:"'Gesprochen' is correct."},
+      {question:"What is 'He eats.' in German?",options:["Er essen.","Er isst.","Er issen.","Er esse."],answer:1,explanation:"'Er isst.' is correct."},
+      {question:"Correct form for 'du' of 'fahren'?",options:["fahrt","fahre","fährst","fahren"],answer:2,explanation:"'Du fährst' is correct."},
+      {question:"Past participle of 'laufen'?",options:["gelaufen","gelauft","läuft","geläuft"],answer:0,explanation:"'Gelaufen' is correct."},
+      {question:"'She has helped.' in German?",options:["Sie hat geholfen.","Sie haben geholfen.","Sie hat hilfen.","Sie helfen hat."],answer:0,explanation:"'Sie hat geholfen.' is correct."}
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function showQuestion() {
+      const data = quizData[currentQuestion];
+      document.getElementById('question').textContent = data.question;
+      document.getElementById('result').textContent = '';
+      document.getElementById('options').innerHTML = '';
+      document.getElementById('nextBtn').disabled = true;
+
+      document.getElementById('progress').textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+
+      data.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => handleAnswer(idx);
+        document.getElementById('options').appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selected) {
+      const data = quizData[currentQuestion];
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === data.answer) btn.style.background = '#a9e6b7';
+        if (idx === selected && selected !== data.answer) btn.style.background = '#f7b2b2';
+      });
+      if (selected === data.answer) {
+        document.getElementById('result').textContent = 'Correct! ' + data.explanation;
+        score++;
+      } else {
+        document.getElementById('result').textContent = 'Incorrect! ' + data.explanation;
+      }
+      document.getElementById('nextBtn').disabled = false;
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        showQuestion();
+      } else {
+        document.getElementById('quiz').innerHTML =
+          `<div class="result">Quiz complete!<br>Your score: ${score} out of ${quizData.length}</div>`;
+      }
+    };
+
+    showQuestion();
+  </script>
+</body>
+</html>
