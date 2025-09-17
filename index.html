@@ -66,8 +66,20 @@
   </style>
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="quiz-container">
+    <div id="quiz">
+      <div class="progress" id="progress"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="result" id="result"></div>
+      <button class="next-btn" id="nextBtn" disabled>Next</button>
+    </div>
+  </div>
+
   <script>
-    // Supabase setup - MAKE SURE THIS IS AT THE TOP BEFORE ANY CODE THAT CALLS supabase
+    // Supabase setup
     const supabaseUrl = 'https://sxggjcqxgmnzkypzfdnt.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4Z2dqY3F4Z21uemt5cHpmZG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMDg4MTcsImV4cCI6MjA3MzY4NDgxN30.AcyPXqtP9KqQ7qfgnvyBiHd3jtJDrwgykn3FxykPe-M';
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -78,7 +90,6 @@
       {question:"What is the correct past participle of 'gehen'?",options:["gegessen","gegangen","gekommen","gegebt"],answer:1,explanation:"'Gegangen' is the past participle of 'gehen'."},
       {question:"Choose the right translation for 'They have learned.'",options:["Sie hat gelernt.","Sie haben gelernt.","Ihr habt gelernt.","Er hat gelernt."],answer:1,explanation:"'Sie haben gelernt.' is correct for 'They have learned.'"},
       {question:"Which is the correct conjugation for 'du' (informal you) of 'sprechen'?",options:["spricht","spreche","sprichst","sprecht"],answer:2,explanation:"'Du sprichst' is correct. 'Sprichst' is for 'du'."},
-      {question:"'I am writing an email.' in German?",options:["Ich schreibe eine E-Mail.","Ich schreibt eine E-Mail.","Ich schreibst eine E-Mail.","Ich schreiben eine E-Mail."],answer:0,explanation:"'Ich schreibe eine E-Mail.' is the correct."},
       {question:"What is the correct form of 'haben' for 'ihr'?",options:["habt","hat","habe","haben"],answer:0,explanation:"'Ihr habt' is the correct form."},
       {question:"What is the past participle of 'sehen'?",options:["gesehen","gesieht","gesehenen","gesehenes"],answer:0,explanation:"'Gesehen' is the past participle of 'sehen'."},
       {question:"How do you say 'We are coming.' in German?",options:["Wir kommt.","Wir kommen.","Wir kommenen.","Wir kommenes."],answer:1,explanation:"'Wir kommen.' is correct."},
@@ -123,7 +134,8 @@
       {question:"What is 'He eats.' in German?",options:["Er essen.","Er isst.","Er issen.","Er esse."],answer:1,explanation:"'Er isst.' is correct."},
       {question:"Correct form for 'du' of 'fahren'?",options:["fahrt","fahre","fährst","fahren"],answer:2,explanation:"'Du fährst' is correct."},
       {question:"Past participle of 'laufen'?",options:["gelaufen","gelauft","läuft","geläuft"],answer:0,explanation:"'Gelaufen' is correct."},
-      {question:"'She has helped.' in German?",options:["Sie hat geholfen.","Sie haben geholfen.","Sie hat hilfen.","Sie helfen hat."],answer:0,explanation:"'Sie hat geholfen.' is correct."}
+      {question:"'She has helped.' in German?",options:["Sie hat geholfen.","Sie haben geholfen.","Sie hat hilfen.","Sie helfen hat."],answer:0,explanation:"'Sie hat geholfen.' is correct."},
+      {question:"'I am writing an email.' in German?",options:["Ich schreibe eine E-Mail.","Ich schreibt eine E-Mail.","Ich schreibst eine E-Mail.","Ich schreiben eine E-Mail."],answer:0,explanation:"'Ich schreibe eine E-Mail.' is the correct."}
     ];
 
     let currentQuestion = 0;
@@ -164,51 +176,33 @@
       document.getElementById('nextBtn').disabled = false;
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-      showQuestion();
-      document.getElementById('nextBtn').onclick = () => {
-        currentQuestion++;
-        if (currentQuestion < quizData.length) {
-          showQuestion();
-        } else {
-          document.getElementById('quiz').innerHTML =
-            `<div class="result">Quiz complete!<br>Your score: ${score} out of ${quizData.length}</div>`;
-          // Save result to Supabase
-          saveResult('anonymous', score, quizData.length);
-        }
-      };
-    });
+    document.getElementById('nextBtn').onclick = () => {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        showQuestion();
+      } else {
+        document.getElementById('quiz').innerHTML =
+          `<div class="result">Quiz complete!<br>Your score: ${score} out of ${quizData.length}</div>`;
+        // Save result to Supabase
+        saveResult('anonymous', score, quizData.length);
+      }
+    };
 
     // Supabase function to save result
     async function saveResult(username, score, total) {
-      try {
-        const { data, error } = await supabase
-          .from('quiz_results')
-          .insert([{ username, score, total, completed_at: new Date().toISOString() }]);
-        if (error) {
-          alert('Error saving result: ' + error.message);
-          console.error('Supabase insert error:', error);
-        } else {
-          // Optionally let the user know results were saved
-          document.getElementById('quiz').innerHTML +=
-            `<div class="result">Result saved!</div>`;
-        }
-      } catch (err) {
-        alert('Unexpected error saving result: ' + err.message);
-        console.error('Unexpected error:', err);
+      const { data, error } = await supabase
+        .from('quiz_results')
+        .insert([{ username, score, total, completed_at: new Date().toISOString() }]);
+      if (error) {
+        alert('Error saving result: ' + error.message);
+      } else {
+        // Optionally let the user know results were saved
+        document.getElementById('quiz').innerHTML +=
+          `<div class="result">Result saved!</div>`;
       }
     }
+
+    showQuestion();
   </script>
-</head>
-<body>
-  <div class="quiz-container">
-    <div id="quiz">
-      <div class="progress" id="progress"></div>
-      <div class="question" id="question"></div>
-      <div class="options" id="options"></div>
-      <div class="result" id="result"></div>
-      <button class="next-btn" id="nextBtn" disabled>Next</button>
-    </div>
-  </div>
 </body>
 </html>
