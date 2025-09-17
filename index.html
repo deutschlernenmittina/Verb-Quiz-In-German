@@ -64,6 +64,8 @@
       color: #4a90e2;
     }
   </style>
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="quiz-container">
@@ -77,7 +79,12 @@
   </div>
 
   <script>
-    // 50 German verb quiz questions: question, options, answer index, explanation
+    // Supabase setup
+    const supabaseUrl = 'https://sxggjcqxgmnzkypzfdnt.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4Z2dqY3F4Z21uemt5cHpmZG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMDg4MTcsImV4cCI6MjA3MzY4NDgxN30.AcyPXqtP9KqQ7qfgnvyBiHd3jtJDrwgykn3FxykPe-M';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // 50 German verb quiz questions
     const quizData = [
       {question:"What is the correct form of 'sein' for 'ich'?",options:["bist","bin","ist","seid"],answer:1,explanation:"'Ich bin' is correct. 'Bin' is the 1st person singular of 'sein'."},
       {question:"What is the correct past participle of 'gehen'?",options:["gegessen","gegangen","gekommen","gegebt"],answer:1,explanation:"'Gegangen' is the past participle of 'gehen'."},
@@ -176,8 +183,24 @@
       } else {
         document.getElementById('quiz').innerHTML =
           `<div class="result">Quiz complete!<br>Your score: ${score} out of ${quizData.length}</div>`;
+        // Save result to Supabase
+        saveResult('anonymous', score, quizData.length);
       }
     };
+
+    // Supabase function to save result
+    async function saveResult(username, score, total) {
+      const { data, error } = await supabase
+        .from('quiz_results')
+        .insert([{ username, score, total, completed_at: new Date().toISOString() }]);
+      if (error) {
+        alert('Error saving result: ' + error.message);
+      } else {
+        // Optionally let the user know results were saved
+        document.getElementById('quiz').innerHTML +=
+          `<div class="result">Result saved!</div>`;
+      }
+    }
 
     showQuestion();
   </script>
