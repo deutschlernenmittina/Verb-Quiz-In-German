@@ -66,6 +66,7 @@
   </style>
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
 </head>
 <body>
   <div class="quiz-container">
@@ -80,9 +81,10 @@
 
   <script>
     // Supabase setup
+    import { createClient } from '@supabase/supabase-js'
     const supabaseUrl = 'https://sxggjcqxgmnzkypzfdnt.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4Z2dqY3F4Z21uemt5cHpmZG50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMDg4MTcsImV4cCI6MjA3MzY4NDgxN30.AcyPXqtP9KqQ7qfgnvyBiHd3jtJDrwgykn3FxykPe-M';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // 50 German verb quiz questions
     const quizData = [
